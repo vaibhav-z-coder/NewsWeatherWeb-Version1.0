@@ -1,0 +1,135 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather + News Aggregator Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <video class="weather-video" autoplay muted loop playsinline poster="">
+        <source src="https://cdn.coverr.co/videos/coverr-rain-on-glass-8413/1080p.mp4" type="video/mp4">
+    </video>
+    <div class="animated-sky"></div>
+    <div class="rain-layer"></div>
+
+    <main class="page">
+        <header class="topbar">
+            <div class="brand">
+                <div class="logo">WN</div>
+                <div>
+                    <h1>WeatherNews</h1>
+                    <p>Live weather + location-based headlines</p>
+                </div>
+            </div>
+
+            <form class="controls" id="searchForm">
+                <div class="input-wrap">
+                    <input id="cityInput" type="search" placeholder="Search city, e.g. Delhi" autocomplete="off">
+                </div>
+
+                <div class="select-wrap">
+                    <select id="categorySelect" aria-label="Select news category">
+                        <option value="general">General</option>
+                        <option value="technology">Technology</option>
+                        <option value="sports">Sports</option>
+                        <option value="business">Business</option>
+                        <option value="health">Health</option>
+                        <option value="entertainment">Entertainment</option>
+                    </select>
+                </div>
+
+                <button type="submit">Search</button>
+            </form>
+
+            <button class="ghost-btn" id="locationBtn" type="button">Use My Location</button>
+        </header>
+
+        <section class="hero">
+            <article class="panel weather-main">
+                <div class="status-line">
+                    <span class="live-dot"></span>
+                    <span id="weatherStatus">Waiting for location or city search</span>
+                </div>
+
+                <div class="weather-grid">
+                    <div>
+                        <div class="temp" id="temperature">--°</div>
+                        <h2 class="city" id="cityName">Search a city</h2>
+                        <p class="condition" id="conditionText">Weather details will appear here.</p>
+                    </div>
+                    <img class="weather-icon" id="weatherIcon" src="https://openweathermap.org/img/wn/01d@4x.png" alt="Weather icon">
+                </div>
+
+                <div class="metric-row">
+                    <div class="metric">
+                        <span>Humidity</span>
+                        <strong id="humidity">--%</strong>
+                    </div>
+                    <div class="metric">
+                        <span>Wind Speed</span>
+                        <strong id="windSpeed">-- m/s</strong>
+                    </div>
+                    <div class="metric">
+                        <span>Feels Like</span>
+                        <strong id="feelsLike">--°C</strong>
+                    </div>
+                </div>
+            </article>
+
+            <div class="side-stack">
+                <section class="panel map-panel">
+                    <div class="panel-head">
+                        <div>
+                            <h2>Interactive Map</h2>
+                            <p>Click anywhere to load weather and nearby news.</p>
+                        </div>
+                    </div>
+                    <div id="map"></div>
+                </section>
+
+                <section class="panel insights">
+                    <div class="insight-card">
+                        <div>
+                            <span>Selected category</span>
+                            <strong id="activeCategory">General</strong>
+                        </div>
+                        <span>Live</span>
+                    </div>
+                    <div class="insight-card">
+                        <div>
+                            <span>News region</span>
+                            <strong id="newsRegion">India</strong>
+                        </div>
+                        <span id="articleCount">0 articles</span>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <section class="news-section">
+            <div class="section-title">
+                <div>
+                    <h2>Latest Headlines</h2>
+                    <p id="newsStatus">News will load after location or city selection.</p>
+                </div>
+            </div>
+            <div class="news-grid" id="newsGrid"></div>
+        </section>
+
+        <footer class="footer">
+            <p>Data sources: OpenWeather API + NewsAPI / mock fallback.</p>
+            <p><a href="#">Privacy</a> · <a href="#">Terms</a> · <a href="#">API Credits</a></p>
+        </footer>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="./script.js"></script>
+</body>
+</html>
