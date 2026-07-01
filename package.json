@@ -1,13 +1,19 @@
 {
   "name": "weatherprojectwebsite",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Weather and news aggregator dashboard using Express, OpenWeather API, and NewsAPI.",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "weather",
+    "news",
+    "express",
+    "openweather",
+    "newsapi"
+  ],
+  "author": "Vaibhav Singh",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.6",
