@@ -16,7 +16,10 @@
             newsRegion: document.getElementById("newsRegion"),
             articleCount: document.getElementById("articleCount"),
             newsGrid: document.getElementById("newsGrid"),
-            newsStatus: document.getElementById("newsStatus")
+            newsStatus: document.getElementById("newsStatus"),
+            forecastTemps: document.querySelectorAll("[data-forecast-temp]"),
+            forecastTimes: document.querySelectorAll("[data-forecast-time]"),
+            forecastIcons: document.querySelectorAll("[data-forecast-icon]")
         };
 
         const mockArticles = [
@@ -107,6 +110,17 @@
             return data;
         }
 
+        async function fetchForecast(lat, lon) {
+            const response = await fetch(`/api/weather/forecast?lat=${lat}&lon=${lon}`);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Forecast API failed");
+            }
+
+            return data;
+        }
+
         async function fetchNews(city, category) {
             const query = encodeURIComponent(city || currentCity || "Delhi");
             const selectedCategory = encodeURIComponent(category || "general");
@@ -157,6 +171,109 @@
             if (data.coord) updateMap(data.coord.lat, data.coord.lon, data.name);
         }
 
+        function renderForecast(data) {
+            if (!data?.list) return;
+
+            const hourly = data.list.slice(0, 6);
+
+            hourly.forEach((item, index) => {
+                if (els.forecastTemps[index]) {
+                    els.forecastTemps[index].textContent = `${Math.round(item.main.temp)}°`;
+                }
+
+                if (els.forecastTimes[index]) {
+                    els.forecastTimes[index].textContent = new Date(item.dt * 1000).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    });
+                }
+
+                if (els.forecastIcons[index]) {
+                    const icon = item.weather?.[0]?.icon || "01d";
+                    const desc = item.weather?.[0]?.description || "Forecast";
+                    els.forecastIcons[index].src = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+                    els.forecastIcons[index].alt = desc;
+                }
+            });
+            renderWeeklyForecast(data);
+        }
+
+        function buildWeeklyForecast(list) {
+    const groupedDays = new Map();
+
+    list.forEach(item => {
+        const date = new Date(item.dt * 1000);
+        const key = date.toLocaleDateString("en-CA");
+
+        if (!groupedDays.has(key)) groupedDays.set(key, []);
+        groupedDays.get(key).push(item);
+    });
+
+    const todayKey = new Date().toLocaleDateString("en-CA");
+const upcomingDays = Array.from(groupedDays.entries())
+    .filter(([key]) => key !== todayKey)
+    .map(([, value]) => value)
+    .slice(0, 5);
+
+return upcomingDays.map(dayItems => {
+        const temps = dayItems.map(item => item.main.temp);
+        const mainItem = dayItems.find(item => {
+            const hour = new Date(item.dt * 1000).getHours();
+            return hour >= 11 && hour <= 14;
+        }) || dayItems[0];
+
+        return {
+            date: new Date(mainItem.dt * 1000),
+            max: Math.round(Math.max(...temps)),
+            min: Math.round(Math.min(...temps)),
+            humidity: mainItem.main.humidity,
+            wind: Math.round(mainItem.wind.speed * 3.6),
+            icon: mainItem.weather?.[0]?.icon || "01d",
+            desc: mainItem.weather?.[0]?.description || "Forecast"
+        };
+    });
+}
+
+function renderWeeklyForecast(data) {
+    const grid = document.getElementById("weeklyForecastGrid");
+    const location = document.getElementById("weeklyForecastLocation");
+
+    if (!grid || !data?.list) return;
+
+    const weekly = buildWeeklyForecast(data.list);
+
+    if (location) {
+        location.textContent = `${data.city?.name || currentCity || "Selected location"} • Next 5 days weather overview`;
+    }
+
+    grid.innerHTML = weekly.map(day => `
+        <article class="weekly-card">
+            <span class="day-name">${day.date.toLocaleDateString([], { weekday: "short" })}</span>
+            <span class="date-label">${day.date.toLocaleDateString([], { month: "short", day: "numeric" })}</span>
+
+            <img src="https://openweathermap.org/img/wn/${day.icon}@2x.png" alt="${day.desc}">
+
+            <div class="weekly-temp">
+                <strong>${day.max}°</strong>
+                <span>${day.min}°</span>
+            </div>
+
+            <p class="weekly-desc">${day.desc}</p>
+
+            <div class="weekly-details">
+                <div class="weekly-detail">
+                    <span>Humidity</span>
+                    <strong>${day.humidity}%</strong>
+                </div>
+                <div class="weekly-detail">
+                    <span>Wind</span>
+                    <strong>${day.wind} km/h</strong>
+                </div>
+            </div>
+        </article>
+    `).join("");
+}
+
         function renderNews(articles) {
             if (!articles.length) {
                 els.articleCount.textContent = "0 articles";
@@ -197,6 +314,14 @@
                 showLoader(els.newsGrid, "Loading news articles...");
                 const weather = await fetchWeatherByCity(city);
                 renderWeather(weather);
+               try {
+    if (weather.coord) {
+        const forecast = await fetchForecast(weather.coord.lat, weather.coord.lon);
+        renderForecast(forecast);
+    }
+} catch (err) {
+    console.warn("Forecast failed:", err);
+}
                 const news = await fetchNews(currentCity, els.categorySelect.value);
                 renderNews(news);
             } catch (error) {
@@ -211,6 +336,12 @@
                 showLoader(els.newsGrid, "Loading local headlines...");
                 const weather = await fetchWeatherByCoords(lat, lon);
                 renderWeather(weather);
+                try {
+    const forecast = await fetchForecast(lat, lon);
+    renderForecast(forecast);
+} catch (err) {
+    console.warn("Forecast failed:", err);
+}
                 const news = await fetchNews(currentCity, els.categorySelect.value);
                 renderNews(news);
             } catch (error) {
@@ -302,3 +433,32 @@
         initMap();
         showLoader(els.newsGrid, "Preparing dashboard...");
         useBrowserLocation();
+        const nextDaysBtn = document.getElementById("nextDaysBtn");
+const forecastModal = document.getElementById("forecastModal");
+const closeForecastBtns = document.querySelectorAll("[data-close-forecast]");
+
+function openForecastModal() {
+    forecastModal.classList.add("show");
+    forecastModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+}
+
+function closeForecastModal() {
+    forecastModal.classList.remove("show");
+    forecastModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+}
+
+if (nextDaysBtn && forecastModal) {
+    nextDaysBtn.addEventListener("click", openForecastModal);
+}
+
+closeForecastBtns.forEach((btn) => {
+    btn.addEventListener("click", closeForecastModal);
+});
+
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+        closeForecastModal();
+    }
+});

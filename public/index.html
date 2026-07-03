@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -112,6 +110,85 @@
                 </section>
             </div>
         </section>
+
+        <section class="hourly-forecast-section">
+            <div class="hourly-forecast-card">
+                <div class="hourly-forecast-head">
+                    <h2>Hourly Forecast</h2>
+                    <button type="button" class="next-days-btn" id="nextDaysBtn" aria-label="View next five days forecast">Next 5 Days ›</button>
+                </div>
+
+                <div class="forecast-graph" aria-label="Hourly temperature graph">
+                    <svg viewBox="0 0 1000 190" preserveAspectRatio="none" aria-hidden="true">
+                        <path class="forecast-line" d="M40 92 C170 82, 260 76, 360 66 C455 58, 545 58, 640 66 C755 76, 870 84, 960 92"></path>
+                        <circle class="forecast-dot" cx="40" cy="92" r="8"></circle>
+                        <circle class="forecast-dot" cx="200" cy="78" r="8"></circle>
+                        <circle class="forecast-dot" cx="360" cy="66" r="8"></circle>
+                        <circle class="forecast-dot" cx="520" cy="64" r="8"></circle>
+                        <circle class="forecast-dot" cx="700" cy="78" r="8"></circle>
+                        <circle class="forecast-dot" cx="960" cy="92" r="8"></circle>
+                    </svg>
+
+                    <div class="forecast-temps" id="forecastTemps">
+                        <span data-forecast-temp="0">--°</span>
+                        <span data-forecast-temp="1">--°</span>
+                        <span data-forecast-temp="2">--°</span>
+                        <span data-forecast-temp="3">--°</span>
+                        <span data-forecast-temp="4">--°</span>
+                        <span data-forecast-temp="5">--°</span>
+                    </div>
+                </div>
+
+                <div class="hourly-slots" id="hourlySlots">
+                    <div class="hourly-slot">
+                        <span data-forecast-time="0">--:--</span>
+                        <img data-forecast-icon="0" src="https://openweathermap.org/img/wn/02d@2x.png" alt="Forecast weather icon">
+                    </div>
+                    <div class="hourly-slot">
+                        <span data-forecast-time="1">--:--</span>
+                        <img data-forecast-icon="1" src="https://openweathermap.org/img/wn/01d@2x.png" alt="Forecast weather icon">
+                    </div>
+                    <div class="hourly-slot">
+                        <span data-forecast-time="2">--:--</span>
+                        <img data-forecast-icon="2" src="https://openweathermap.org/img/wn/01d@2x.png" alt="Forecast weather icon">
+                    </div>
+                    <div class="hourly-slot">
+                        <span data-forecast-time="3">--:--</span>
+                        <img data-forecast-icon="3" src="https://openweathermap.org/img/wn/02d@2x.png" alt="Forecast weather icon">
+                    </div>
+                    <div class="hourly-slot">
+                        <span data-forecast-time="4">--:--</span>
+                        <img data-forecast-icon="4" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Forecast weather icon">
+                    </div>
+                    <div class="hourly-slot">
+                        <span data-forecast-time="5">--:--</span>
+                        <img data-forecast-icon="5" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Forecast weather icon">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="forecast-modal" id="forecastModal" aria-hidden="true">
+            <div class="forecast-modal-backdrop" data-close-forecast></div>
+            <section class="forecast-modal-card" role="dialog" aria-modal="true" aria-labelledby="weeklyForecastTitle">
+                <div class="forecast-modal-head">
+                    <div>
+                        <span class="modal-kicker">Premium weekly view</span>
+                        <h2 id="weeklyForecastTitle">Next 5 Days Forecast</h2>
+                        <p id="weeklyForecastLocation">Search a city to load weekly weather details.</p>
+                    </div>
+                    <button type="button" class="forecast-close-btn" data-close-forecast aria-label="Close seven day forecast">×</button>
+                </div>
+
+                <div class="weekly-forecast-grid" id="weeklyForecastGrid">
+                    <article class="weekly-card skeleton-card">
+                        <span>Waiting</span>
+                        <h3>--</h3>
+                        <p>Search city or use location to load upcoming forecast.</p>
+                    </article>
+                </div>
+            </section>
+        </div>
 
         <section class="news-section">
             <div class="section-title">
